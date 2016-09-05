@@ -881,7 +881,12 @@ if not _dll_filename:
         pass
 if _dll_filename:
     try:
-        _dll = ctypes.cdll.LoadLibrary(_dll_filename)
+        if hasattr(ctypes, 'windll'):
+            # Assume that the presence of ctypes.windll indicates we're on Windows.
+            # In this case, we must use the stdcall calling convention.
+            _dll = ctypes.windll.LoadLibrary(_dll_filename)
+        else:
+            _dll = ctypes.cdll.LoadLibrary(_dll_filename)
     except:
         raise RuntimeError('Could not load OpenCL dll: %s' % _dll_filename)
 else:
